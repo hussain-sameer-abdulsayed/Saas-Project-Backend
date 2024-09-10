@@ -8,6 +8,9 @@ namespace SassProject.Models
         public string LastName { get; set; } = string.Empty;
         public string CreatedAt { get; set; } = DateTime.Now.ToString("MM/dd/yyyy hh:mm tt");
         public string UpdatedAt { get; set; } = DateTime.Now.ToString("MM/dd/yyyy hh:mm tt");
+        public string? RefreeshToken { get; set; }
+        public DateTime RefreshTokenExpiryTime { get; set; }
+        public string ValidationEmailToken { get; set; }
 
     }
 }

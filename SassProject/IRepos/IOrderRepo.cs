@@ -23,6 +23,7 @@ namespace SassProject.IRepos
         Task<IEnumerable<Product>> GetTopSellingProductsAsync(int topN);
         Task<CheckFunc> CreateOrderAsync(CreateOrderDto orderDto);
         Task<CheckFunc> UpdateOrderAsync(string orderId,UpdateOrderDto orderDto);
+        Task<CheckFunc> UpdateOrderItemsAsync(string orderId, List<UpdateOrderItem> orderItemsDto);
         Task<CheckFunc> UpdateOrderStatusAsync(string orderId, OrderStatus status);
         Task<CheckFunc> DeleteOrderAsync(string orderId);
         Task<CheckFunc> CancelOrderAsync(string orderId);

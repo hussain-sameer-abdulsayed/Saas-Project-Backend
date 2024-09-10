@@ -12,7 +12,7 @@ using SassProject.Data;
 namespace SassProject.Migrations
 {
     [DbContext(typeof(Context))]
-    [Migration("20240904215205_CreateDb")]
+    [Migration("20240908223150_CreateDb")]
     partial class CreateDb
     {
         /// <inheritdoc />
@@ -55,20 +55,20 @@ namespace SassProject.Migrations
                         new
                         {
                             Id = "ae2626ab-cea5-458f-82f5-2dbad5009e29",
-                            Name = "SuperAdmin",
+                            Name = "SUPERADMIN",
                             NormalizedName = "SUPERADMIN"
                         },
                         new
                         {
                             Id = "2c5e174e-3b0e-446f-86af-483d56fd7210",
-                            Name = "Admin",
+                            Name = "ADMIN",
                             NormalizedName = "ADMIN"
                         },
                         new
                         {
                             Id = "9b3e174e-10e6-446f-86af-483d56fd7210",
-                            Name = "Viwer",
-                            NormalizedName = "VIWER"
+                            Name = "VIEWER",
+                            NormalizedName = "VIEWER"
                         });
                 });
 
@@ -199,12 +199,10 @@ namespace SassProject.Migrations
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<string>", b =>
                 {
                     b.Property<string>("LoginProvider")
-                        .HasMaxLength(128)
-                        .HasColumnType("nvarchar(128)");
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("ProviderKey")
-                        .HasMaxLength(128)
-                        .HasColumnType("nvarchar(128)");
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("ProviderDisplayName")
                         .HasColumnType("nvarchar(max)");
@@ -248,12 +246,10 @@ namespace SassProject.Migrations
                         .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("LoginProvider")
-                        .HasMaxLength(128)
-                        .HasColumnType("nvarchar(128)");
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("Name")
-                        .HasMaxLength(128)
-                        .HasColumnType("nvarchar(128)");
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("Value")
                         .HasColumnType("nvarchar(max)");
@@ -430,6 +426,41 @@ namespace SassProject.Migrations
                     b.ToTable("Products");
                 });
 
+            modelBuilder.Entity("SassProject.Models.UserRefreshTokens", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Email")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsAuthenticated")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Message")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("RefreshToken")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("UserName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("UserRefreshTokens");
+                });
+
             modelBuilder.Entity("SassProject.Models.User", b =>
                 {
                     b.HasBaseType("Microsoft.AspNetCore.Identity.IdentityUser");
@@ -446,7 +477,17 @@ namespace SassProject.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("RefreeshToken")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("RefreshTokenExpiryTime")
+                        .HasColumnType("datetime2");
+
                     b.Property<string>("UpdatedAt")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ValidationEmailToken")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
@@ -457,21 +498,23 @@ namespace SassProject.Migrations
                         {
                             Id = "0842a1a0-44d2-4882-8266-12e5a939d452",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "65e61b97-4819-4708-bdee-849166216a6e",
+                            ConcurrencyStamp = "f6c1de37-94e0-42c8-b9d7-1da354ce8e73",
                             Email = "Name",
                             EmailConfirmed = true,
                             LockoutEnabled = false,
                             NormalizedEmail = "Name",
-                            PasswordHash = "AEHScrW/IChK3CKBb+cx9E+QE5n07f6azhtSAoB7CfAaqh+nrYR7VqrnsHaqUnBP4Q==",
+                            PasswordHash = "AOQKyPPRFy8LLguAaubroLtBsC3Ngfq0z2CaJYvJuSwyMgcuYMRDsOgIifC5RMXI5w==",
                             PhoneNumber = "Name",
                             PhoneNumberConfirmed = true,
-                            SecurityStamp = "8b28acf8-7ddc-4958-b0ab-0986935cc03b",
+                            SecurityStamp = "36e23c7a-d1cf-443a-8540-bede5e295b3c",
                             TwoFactorEnabled = false,
                             UserName = "Name",
-                            CreatedAt = "09/05/2024 12:52 AM",
+                            CreatedAt = "09/09/2024 01:31 AM",
                             FirstName = "Name",
                             LastName = "Name",
-                            UpdatedAt = "09/05/2024 12:52 AM"
+                            RefreshTokenExpiryTime = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            UpdatedAt = "09/09/2024 01:31 AM",
+                            ValidationEmailToken = "a219941e-d1ca-4643-843f-b7321b1a8a1b"
                         });
                 });
 

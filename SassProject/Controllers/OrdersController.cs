@@ -16,10 +16,12 @@ namespace SassProject.Controllers
     public class OrdersController : ControllerBase
     {
         private readonly IOrderRepo _orderRepo;
+        private readonly ITransactionRepo _transactionRepo;
 
-        public OrdersController(IOrderRepo orderRepo)
+        public OrdersController(IOrderRepo orderRepo, ITransactionRepo transactionRepo)
         {
             _orderRepo = orderRepo;
+            _transactionRepo = transactionRepo;
         }
 
 
@@ -57,7 +59,7 @@ namespace SassProject.Controllers
         }
 
 
-        [HttpGet("by-state/{state}")]
+        [HttpGet("byState/{state}")]
         public async Task<IActionResult> GetOrdersByState(State state)
         {
             try
@@ -76,7 +78,7 @@ namespace SassProject.Controllers
         }
 
 
-        [HttpGet("by-status/{status}")]
+        [HttpGet("byStatus/{status}")]
         public async Task<IActionResult> GetOrdersByStatus(OrderStatus status)
         {
             try
@@ -95,7 +97,7 @@ namespace SassProject.Controllers
         }
 
 
-        [HttpGet("by-phone-number/{phoneNumber}")]
+        [HttpGet("byPhoneNumber/{phoneNumber}")]
         public async Task<IActionResult> GetOrdersByUserPhoneNumber(string phoneNumber)
         {
             try
@@ -133,7 +135,7 @@ namespace SassProject.Controllers
         }
 
 
-        [HttpGet("with-items")]
+        [HttpGet("withItems")]
         public async Task<IActionResult> GetOrdersWithItems()
         {
             try
@@ -171,7 +173,7 @@ namespace SassProject.Controllers
         }
 
 
-        [HttpGet("top-products/{topN}")]
+        [HttpGet("topProducts/{topN}")]
         public async Task<IActionResult> GetTopSellingProducts(int topN)
         {
             try
@@ -190,7 +192,7 @@ namespace SassProject.Controllers
         }
 
 
-        [HttpGet("total-sales")]
+        [HttpGet("totalSales")]
         public async Task<IActionResult> GetTotalSales()
         {
             try
@@ -210,15 +212,19 @@ namespace SassProject.Controllers
         {
             try
             {
+                await _transactionRepo.BeginTransactionAsync();
                 var result = await _orderRepo.CreateOrderAsync(orderDto);
                 if (!result.IsSucceeded)
                 {
+                    await _transactionRepo.RollBackTransactionAsync();
                     return BadRequest(new { result.Message });
                 }
+                await _transactionRepo.CommitTransactionAsync();
                 return Ok(new { result.Message });
             }
             catch (Exception ex)
             {
+                await _transactionRepo.RollBackTransactionAsync();
                 return BadRequest(ex.Message);
             }
         }
@@ -229,36 +235,70 @@ namespace SassProject.Controllers
         {
             try
             {
+                await _transactionRepo.BeginTransactionAsync();
                 var result = await _orderRepo.UpdateOrderAsync(orderId, orderDto);
                 if (!result.IsSucceeded)
                 {
+                    await _transactionRepo.RollBackTransactionAsync();
                     return BadRequest(new { result.Message });
                 }
+                await _transactionRepo.CommitTransactionAsync();
                 return Ok(new { result.Message });
             }
             catch (Exception ex)
             {
+                await _transactionRepo.RollBackTransactionAsync();
                 return BadRequest(ex.Message);
             }
         }
 
 
-        // maybe is should change this(patch) to Put
+        [HttpPatch("updateOrderItems/{orderId}")]
+        public async Task<IActionResult> UpdateOrderItems(string orderId, [FromBody] List<UpdateOrderItem> updatedItems)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            try
+            {
+                await _transactionRepo.BeginTransactionAsync();
+                var result = await _orderRepo.UpdateOrderItemsAsync(orderId, updatedItems);
+                if (!result.IsSucceeded)
+                {
+                    await _transactionRepo.RollBackTransactionAsync();
+                    return BadRequest(result.Message);
+                }
+                await _transactionRepo.CommitTransactionAsync();
+                return Ok(result.Message);
+            }
+            catch (Exception ex)
+            {
+                await _transactionRepo.RollBackTransactionAsync();
+                return StatusCode(500, $"Internal server error: {ex.Message}");
+            }
+        }
+
 
         [HttpPatch("{orderId}/status")]
         public async Task<IActionResult> UpdateOrderStatus(string orderId, [FromBody] OrderStatus status)
         {
             try
             {
+                await _transactionRepo.BeginTransactionAsync();
                 var result = await _orderRepo.UpdateOrderStatusAsync(orderId, status);
                 if (!result.IsSucceeded)
                 {
+                    await _transactionRepo.RollBackTransactionAsync();
                     return BadRequest(new { result.Message });
                 }
+                await _transactionRepo.CommitTransactionAsync();
                 return Ok(new { result.Message });
             }
             catch (Exception ex)
             {
+                await _transactionRepo.RollBackTransactionAsync();
                 return BadRequest(ex.Message);
             }
         }
@@ -269,15 +309,19 @@ namespace SassProject.Controllers
         {
             try
             {
+                await _transactionRepo.BeginTransactionAsync();
                 var result = await _orderRepo.DeleteOrderAsync(orderId);
                 if (!result.IsSucceeded)
                 {
+                    await _transactionRepo.RollBackTransactionAsync();
                     return BadRequest(new { result.Message });
                 }
+                await _transactionRepo.CommitTransactionAsync();
                 return Ok(new { result.Message });
             }
             catch (Exception ex)
             {
+                await _transactionRepo.RollBackTransactionAsync();
                 return BadRequest(ex.Message);
             }
         }
@@ -288,15 +332,19 @@ namespace SassProject.Controllers
         {
             try
             {
+                await _transactionRepo.BeginTransactionAsync();
                 var result = await _orderRepo.CancelOrderAsync(orderId);
                 if (!result.IsSucceeded)
                 {
+                    await _transactionRepo.RollBackTransactionAsync();
                     return BadRequest(new { result.Message });
                 }
+                await _transactionRepo.CommitTransactionAsync();
                 return Ok(new { result.Message });
             }
             catch (Exception ex)
             {
+                await _transactionRepo.RollBackTransactionAsync();
                 return BadRequest(ex.Message);
             }
         }

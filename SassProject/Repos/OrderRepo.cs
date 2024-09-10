@@ -24,7 +24,7 @@ namespace SassProject.Repos
                                       .Include(o => o.OrderItems)
                                       .FirstOrDefaultAsync(o => o.Id == orderId);
 
-            
+
         }
 
 
@@ -32,7 +32,7 @@ namespace SassProject.Repos
         {
             // what i have to return here all order data or a sprecific cloumns
             return await _context.Orders.ToListAsync();
-             
+
         }
 
 
@@ -152,7 +152,7 @@ namespace SassProject.Repos
                     OrderItems = new List<OrderItem>(),
                 };
 
-               //do not add order.id add only order cause the order was not saved in the database yet
+                //do not add order.id add only order cause the order was not saved in the database yet
 
                 List<OrderItem> orderItems = new List<OrderItem>();
                 foreach (var item in orderDto.OrderItems)
@@ -185,15 +185,15 @@ namespace SassProject.Repos
 
 
 
-                if(orderDto.Email != null)
+                if (orderDto.Email != null)
                 {
                     order.Email = orderDto.Email;
                 }
-                if(orderDto.Notes != null)
+                if (orderDto.Notes != null)
                 {
                     order.Notes = orderDto.Notes;
                 }
-                if(orderDto.NearestPoint != null)
+                if (orderDto.NearestPoint != null)
                 {
                     order.NearestPoint = orderDto.NearestPoint;
                 }
@@ -214,7 +214,7 @@ namespace SassProject.Repos
                 await _context.Orders.AddAsync(order);
                 await _context.SaveChangesAsync();
 
-                return new CheckFunc { IsSucceeded = true, Message ="Order Created Successfully" };
+                return new CheckFunc { IsSucceeded = true, Message = "Order Created Successfully" };
             }
             catch (Exception ex)
             {
@@ -223,12 +223,12 @@ namespace SassProject.Repos
         }
 
 
-        public async Task<CheckFunc> UpdateOrderAsync(string orderId,UpdateOrderDto orderDto)
+        public async Task<CheckFunc> UpdateOrderAsync(string orderId, UpdateOrderDto orderDto)
         {
             try
             {
                 var order = await _context.Orders.FindAsync(orderId);
-                if(order == null)
+                if (order == null)
                 {
                     return new CheckFunc { Message = $"An Error Cccurred While Updating The Order : There is no order with this ID {orderId}" };
                 }
@@ -257,7 +257,7 @@ namespace SassProject.Repos
                 {
                     order.Notes = orderDto.Notes;
                 }
-                if(orderDto.State != null)
+                if (orderDto.State != null)
                 {
                     order.State = orderDto.State.Value;
                 }
@@ -287,7 +287,7 @@ namespace SassProject.Repos
         public async Task<CheckFunc> DeleteOrderAsync(string orderId)
         {
             var order = await _context.Orders.FindAsync(orderId);
-            if(order != null)
+            if (order != null)
             {
                 _context.Orders.Remove(order);
                 await _context.SaveChangesAsync();
@@ -320,6 +320,120 @@ namespace SassProject.Repos
             }
             return new CheckFunc { Message = $"An Error Cccurred While Creating The Order : There is no order with is Order Id {orderId}" };
         }
+
+        public async Task<CheckFunc> UpdateOrderItemsAsync(string orderId, List<UpdateOrderItem> orderItemsDto)
+        {
+            try
+            {
+                // Find the order with its order items
+                var order = await _context.Orders
+                                  .Include(o => o.OrderItems)  // Include existing order items
+                                  .FirstOrDefaultAsync(o => o.Id == orderId);
+
+                if (order == null)
+                {
+                    return new CheckFunc { Message = $"Order with ID {orderId} was not found." };
+                }
+
+                var productsToUpdate = new Dictionary<int, int>();
+
+                foreach (var updatedItem in orderItemsDto)
+                {
+                    var product = await _context.Products.FindAsync(updatedItem.ProductId);
+
+                    if (product == null)
+                    {
+                        return new CheckFunc { Message = $"Product with ID {updatedItem.ProductId} was not found." };
+                    }
+
+                    // Check for stock availability for the new or updated quantity
+                    if (product.StockQuantity < updatedItem.Quantity)
+                    {
+                        return new CheckFunc { Message = $"Insufficient stock for product {product.Name}." };
+                    }
+
+
+                    // in frontEnd if we add a new item(product) to the order send in orderitemId = "0"
+                    if (updatedItem.OrderItemId == "0")
+                    {
+                        // New OrderItem, create and add it
+                        var newOrderItem = new OrderItem
+                        {
+                            ProductId = updatedItem.ProductId,
+                            Product = product,
+                            Quantity = updatedItem.Quantity,
+                            UnitPrice = product.Price,
+                            Order = order,
+                            OrderId = orderId
+                        };
+                        newOrderItem.CalcTotal();
+
+                        order.OrderItems.Add(newOrderItem);
+
+                        // Track product quantity change
+                        if (!productsToUpdate.ContainsKey(product.Id))
+                        {
+                            productsToUpdate[product.Id] = 0;
+                        }
+                        productsToUpdate[product.Id] -= updatedItem.Quantity;
+                    }
+                    else
+                    {
+                        // Update existing OrderItem
+                        var orderItem = order.OrderItems.FirstOrDefault(oi => oi.Id == updatedItem.OrderItemId);
+
+                        if (orderItem != null)
+                        {
+                            // Track the change in quantity
+                            int quantityChange = updatedItem.Quantity - orderItem.Quantity;
+
+                            // Check if stock is sufficient after considering the change
+                            if (product.StockQuantity < quantityChange)
+                            {
+                                return new CheckFunc { Message = $"Insufficient stock for product {product.Name}." };
+                            }
+
+                            // Update the existing order item
+                            orderItem.Quantity = updatedItem.Quantity;
+                            orderItem.CalcTotal();
+
+                            // Track product quantity change
+                            if (!productsToUpdate.ContainsKey(product.Id))
+                            {
+                                productsToUpdate[product.Id] = 0;
+                            }
+                            productsToUpdate[product.Id] -= quantityChange;
+                        }
+                    }
+                }
+
+                // Update product stock based on changes
+                foreach (var kvp in productsToUpdate)
+                {
+                    var product = await _context.Products.FindAsync(kvp.Key);
+                    if (product != null)
+                    {
+                        product.StockQuantity += kvp.Value;
+                        _context.Products.Update(product);
+                    }
+                }
+
+                // Recalculate order total amount
+                order.TotalAmount = 0;
+                order.CalculateTotalAmount();
+
+                // Save changes
+                await _context.SaveChangesAsync();
+
+                return new CheckFunc { IsSucceeded = true, Message = "Order items updated successfully." };
+            }
+            catch (Exception ex)
+            {
+                return new CheckFunc { Message = $"An error occurred while updating order items: {ex.Message}" };
+            }
+        }
+
+
 
     }
 }

@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Net.Http.Headers;
 using SassProject.Data;
 using SassProject.Dtos.ProductRepo;
 using SassProject.IRepos;
@@ -10,14 +11,18 @@ namespace SassProject.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class ProductController : ControllerBase
+    public class productsController : ControllerBase
     {
         private readonly Context _context;
         private readonly IProductRepo _productRepo;
-        public ProductController(Context context, IProductRepo productRepo)
+        private readonly ITransactionRepo _transactionRepo;
+        private readonly IJWTMangerRepo _jWTMangerRepo;
+        public productsController(Context context, IProductRepo productRepo, ITransactionRepo transactionRepo, IJWTMangerRepo jWTMangerRepo)
         {
             _context = context;
             _productRepo = productRepo;
+            _transactionRepo = transactionRepo;
+            _jWTMangerRepo = jWTMangerRepo;
         }
 
 
@@ -83,22 +88,25 @@ namespace SassProject.Controllers
         {
             try
             {
-                /*
                 string accessToken = Request.Headers[HeaderNames.Authorization];
                 var token = accessToken.Substring(7);
-                var userId = _jwtManagerRepo.GetUserId(token);
-                */
-                var userId = "0842a1a0-44d2-4882-8266-12e5a939d452";
+                var userId = _jWTMangerRepo.GetUserId(token);
 
+                //var userId = "0842a1a0-44d2-4882-8266-12e5a939d452";
+
+                await _transactionRepo.BeginTransactionAsync();
                 var isCreated = await _productRepo.CreateProductAsync(userId, productDto);
                 if (!isCreated.IsSucceeded)
                 {
+                    await _transactionRepo.RollBackTransactionAsync();
                     return BadRequest(isCreated.Message);
                 }
+                await _transactionRepo.CommitTransactionAsync();
                 return Ok(isCreated.Message);
             }
             catch (Exception ex)
             {
+                await _transactionRepo.RollBackTransactionAsync();
                 return BadRequest($"An error occurred while trying to create product : {ex.Message}");
             }
         }
@@ -109,15 +117,19 @@ namespace SassProject.Controllers
         {
             try
             {
+                await _transactionRepo.BeginTransactionAsync();
                 var isUpdated = await _productRepo.UpdateProductAsync(productId, productDto);
                 if (!isUpdated.IsSucceeded)
                 {
+                    await _transactionRepo.RollBackTransactionAsync();
                     return BadRequest(isUpdated.Message);
                 }
+                await _transactionRepo.CommitTransactionAsync();
                 return Ok(isUpdated.Message);
             }
             catch (Exception ex)
             {
+                await _transactionRepo.RollBackTransactionAsync();
                 return BadRequest($"An error occurred while trying to update product  : {ex.Message}");
             }
         }
@@ -128,15 +140,19 @@ namespace SassProject.Controllers
         {
             try
             {
+                await _transactionRepo.BeginTransactionAsync();
                 var isDeleted = await _productRepo.DeleteProductAsync(productId);
                 if (!isDeleted.IsSucceeded)
                 {
+                    await _transactionRepo.RollBackTransactionAsync();
                     return BadRequest(isDeleted.Message);
                 }
+                await _transactionRepo.CommitTransactionAsync();
                 return Ok(isDeleted.Message);
             }
             catch (Exception ex)
             {
+                await _transactionRepo.RollBackTransactionAsync();
                 return BadRequest($"An error occurred while trying to delete product : {ex.Message}");
             }
         }

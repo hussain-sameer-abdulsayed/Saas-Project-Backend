@@ -50,6 +50,24 @@ namespace SassProject.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "UserRefreshTokens",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Message = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    IsAuthenticated = table.Column<bool>(type: "bit", nullable: false),
+                    UserName = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Email = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    RefreshToken = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    IsActive = table.Column<bool>(type: "bit", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_UserRefreshTokens", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Users",
                 columns: table => new
                 {
@@ -59,6 +77,9 @@ namespace SassProject.Migrations
                     LastName = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     CreatedAt = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     UpdatedAt = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    RefreeshToken = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    RefreshTokenExpiryTime = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    ValidationEmailToken = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     UserName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
                     NormalizedUserName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
                     Email = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
@@ -148,8 +169,8 @@ namespace SassProject.Migrations
                 name: "UserLogins",
                 columns: table => new
                 {
-                    LoginProvider = table.Column<string>(type: "nvarchar(128)", maxLength: 128, nullable: false),
-                    ProviderKey = table.Column<string>(type: "nvarchar(128)", maxLength: 128, nullable: false),
+                    LoginProvider = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    ProviderKey = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     ProviderDisplayName = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     UserId = table.Column<string>(type: "nvarchar(450)", nullable: false)
                 },
@@ -193,8 +214,8 @@ namespace SassProject.Migrations
                 columns: table => new
                 {
                     UserId = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    LoginProvider = table.Column<string>(type: "nvarchar(128)", maxLength: 128, nullable: false),
-                    Name = table.Column<string>(type: "nvarchar(128)", maxLength: 128, nullable: false),
+                    LoginProvider = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    Name = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     Value = table.Column<string>(type: "nvarchar(max)", nullable: true)
                 },
                 constraints: table =>
@@ -274,15 +295,15 @@ namespace SassProject.Migrations
                 columns: new[] { "Id", "ConcurrencyStamp", "Name", "NormalizedName" },
                 values: new object[,]
                 {
-                    { "2c5e174e-3b0e-446f-86af-483d56fd7210", null, "Admin", "ADMIN" },
-                    { "9b3e174e-10e6-446f-86af-483d56fd7210", null, "Viwer", "VIWER" },
-                    { "ae2626ab-cea5-458f-82f5-2dbad5009e29", null, "SuperAdmin", "SUPERADMIN" }
+                    { "2c5e174e-3b0e-446f-86af-483d56fd7210", null, "ADMIN", "ADMIN" },
+                    { "9b3e174e-10e6-446f-86af-483d56fd7210", null, "VIEWER", "VIEWER" },
+                    { "ae2626ab-cea5-458f-82f5-2dbad5009e29", null, "SUPERADMIN", "SUPERADMIN" }
                 });
 
             migrationBuilder.InsertData(
                 table: "Users",
-                columns: new[] { "Id", "AccessFailedCount", "ConcurrencyStamp", "CreatedAt", "Discriminator", "Email", "EmailConfirmed", "FirstName", "LastName", "LockoutEnabled", "LockoutEnd", "NormalizedEmail", "NormalizedUserName", "PasswordHash", "PhoneNumber", "PhoneNumberConfirmed", "SecurityStamp", "TwoFactorEnabled", "UpdatedAt", "UserName" },
-                values: new object[] { "0842a1a0-44d2-4882-8266-12e5a939d452", 0, "65e61b97-4819-4708-bdee-849166216a6e", "09/05/2024 12:52 AM", "User", "Name", true, "Name", "Name", false, null, "Name", null, "AEHScrW/IChK3CKBb+cx9E+QE5n07f6azhtSAoB7CfAaqh+nrYR7VqrnsHaqUnBP4Q==", "Name", true, "8b28acf8-7ddc-4958-b0ab-0986935cc03b", false, "09/05/2024 12:52 AM", "Name" });
+                columns: new[] { "Id", "AccessFailedCount", "ConcurrencyStamp", "CreatedAt", "Discriminator", "Email", "EmailConfirmed", "FirstName", "LastName", "LockoutEnabled", "LockoutEnd", "NormalizedEmail", "NormalizedUserName", "PasswordHash", "PhoneNumber", "PhoneNumberConfirmed", "RefreeshToken", "RefreshTokenExpiryTime", "SecurityStamp", "TwoFactorEnabled", "UpdatedAt", "UserName", "ValidationEmailToken" },
+                values: new object[] { "0842a1a0-44d2-4882-8266-12e5a939d452", 0, "f6c1de37-94e0-42c8-b9d7-1da354ce8e73", "09/09/2024 01:31 AM", "User", "Name", true, "Name", "Name", false, null, "Name", null, "AOQKyPPRFy8LLguAaubroLtBsC3Ngfq0z2CaJYvJuSwyMgcuYMRDsOgIifC5RMXI5w==", "Name", true, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "36e23c7a-d1cf-443a-8540-bede5e295b3c", false, "09/09/2024 01:31 AM", "Name", "a219941e-d1ca-4643-843f-b7321b1a8a1b" });
 
             migrationBuilder.InsertData(
                 table: "UserRoles",
@@ -368,6 +389,9 @@ namespace SassProject.Migrations
 
             migrationBuilder.DropTable(
                 name: "UserLogins");
+
+            migrationBuilder.DropTable(
+                name: "UserRefreshTokens");
 
             migrationBuilder.DropTable(
                 name: "UserRoles");

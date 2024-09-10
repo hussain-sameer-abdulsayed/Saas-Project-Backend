@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.VisualStudio.Web.CodeGenerators.Mvc.Templates.BlazorIdentity.Pages.Manage;
 using SassProject.Models;
 using System.Security.Cryptography;
 
@@ -19,7 +20,7 @@ public class Context : IdentityDbContext<IdentityUser>
     public DbSet<Category> Categories {  get; set; }
     public DbSet<Order> Orders {  get; set; }
     public DbSet<OrderItem> OrderItems {  get; set; }
-
+    public DbSet<UserRefreshTokens> UserRefreshTokens { get; set; }
 
 
     protected override void OnModelCreating(ModelBuilder builder)
@@ -29,36 +30,37 @@ public class Context : IdentityDbContext<IdentityUser>
         builder.Entity<User>()
             .HasData(new User
             {
-                Id = "0842a1a0-44d2-4882-8266-12e5a939d452",
-                FirstName = "Name",
-                LastName = "Name",
-                UserName = "Name",
-                Email = "Name",
-                NormalizedEmail = "Name",
+                Id = Guid.NewGuid().ToString(),
+                FirstName = "Hussain",
+                LastName = "Sameer",
+                UserName = "HussainSameer1718",
+                Email = "hussainsameer1718@gmail.com",
+                NormalizedEmail = "hussainsameer1718@gmail.com".ToUpper(),
                 PasswordHash = HashPassword("BankLogin!3"),
                 PhoneNumber = "Name",
                 PhoneNumberConfirmed = true,
                 EmailConfirmed = true,
+                ValidationEmailToken = Guid.NewGuid().ToString(),
             });
         builder.Entity<IdentityRole>()
             .HasData(
                 new IdentityRole
                 {
                     Id = "ae2626ab-cea5-458f-82f5-2dbad5009e29",
-                    Name = "SuperAdmin",
-                    NormalizedName = "SuperAdmin".ToUpper()
+                    Name = "SUPERADMIN",
+                    NormalizedName = "SUPERADMIN".ToUpper()
                 },
                 new IdentityRole
                 {
                     Id = "2c5e174e-3b0e-446f-86af-483d56fd7210",
-                    Name = "Admin",
-                    NormalizedName = "Admin".ToUpper()
+                    Name = "ADMIN",
+                    NormalizedName = "ADMIN".ToUpper()
                 },
                 new IdentityRole
                 {
                     Id = "9b3e174e-10e6-446f-86af-483d56fd7210",
-                    Name = "Viwer",
-                    NormalizedName = "Viwer".ToUpper()
+                    Name = "VIEWER",
+                    NormalizedName = "VIEWER".ToUpper()
                 }
                 );
         builder.Entity<IdentityUserRole<string>>()
