@@ -83,7 +83,7 @@ namespace SassProject.Repos
             }
 
         }
-        // I create this because i can't convert from user to identity user
+        // I create this because i cant convert from user to identity user
         private async Task<JwtSecurityToken> CreateJwtTokenIdentity(IdentityUser user)
         {
             try
@@ -370,7 +370,7 @@ namespace SassProject.Repos
             {
                 To = newUser.Email,
                 Subject = "Email Verification",
-                Body = $"Please click the following link to verify your email: <a href='https://localhost:7249/api/user/verify?verificationToken={Uri.EscapeDataString(newUser.ValidationEmailToken)}'>Verify Email</a>"
+                Body = $"Please click the following link to verify your email: <a href=https://localhost:7249/api/user/verify?verificationToken={Uri.EscapeDataString(newUser.ValidationEmailToken)}>Verify Email</a>"
             };
             await _emailService.SendValidationEmailAsync(email);
 
@@ -578,7 +578,7 @@ namespace SassProject.Repos
                 {
                     To = user.Email,
                     Subject = "Reset Password",
-                    Body = $"Please reset your password by clicking here: <a href='{callbackUrl}'>link</a>"
+                    Body = $"Please reset your password by clicking here: <a href={callbackUrl}>link</a>"
                 };
 
                 await _emailService.SendValidationEmailAsync(email);

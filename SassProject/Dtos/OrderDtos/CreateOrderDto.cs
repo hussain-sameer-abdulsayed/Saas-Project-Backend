@@ -10,7 +10,7 @@ namespace SassProject.Dtos.OrderDtos
         public string City { get; set; } = string.Empty;
         public string? NearestPoint { get; set; } = string.Empty;
         public string? Notes { get; set; } = string.Empty;
-        public State State { get; set; }
+        public string? State { get; set; }
 
         public List<CreateOrderItemDto> OrderItems { get; set; } = new List<CreateOrderItemDto>();
     }

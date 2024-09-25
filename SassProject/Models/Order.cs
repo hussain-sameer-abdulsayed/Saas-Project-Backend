@@ -4,24 +4,24 @@ namespace SassProject.Models
 {
     public enum State
     {
-        Wasit,
-        Sulaymaniyah,
-        SalahAlDin,
-        Ninawa,
-        Najaf,
-        Muthanna,
-        Maysan,
-        Kirkuk,
-        Karbala,
-        Erbil,
-        Duhok,
-        Diyala,
-        AlQādisiyyah,
-        DhiQar,
-        Basra,
-        Baghdad,
-        Babil,
-        AlAnbar
+        بغداد,
+        البصرة,
+        نينوى,
+        اربيل,
+        كركوك,
+        السليمانية,
+        دهوك,
+        الانبار,
+        بابل,
+        النجف,
+        كربلاء,
+        ميسان,
+        ديالى,
+        واسط,
+        صلاح_الدين,
+        المثنى,
+        ذي_قار,
+        الديوانية,
     }
     public enum OrderStatus
     {

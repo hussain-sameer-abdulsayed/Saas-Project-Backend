@@ -88,11 +88,12 @@ namespace SassProject.Controllers
         {
             try
             {
+                /*
                 string accessToken = Request.Headers[HeaderNames.Authorization];
                 var token = accessToken.Substring(7);
                 var userId = _jWTMangerRepo.GetUserId(token);
-
-                //var userId = "0842a1a0-44d2-4882-8266-12e5a939d452";
+                */
+                var userId = "0842a1a0-44d2-4882-8266-12e5a939d452";
 
                 await _transactionRepo.BeginTransactionAsync();
                 var isCreated = await _productRepo.CreateProductAsync(userId, productDto);

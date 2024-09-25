@@ -146,7 +146,7 @@ namespace SassProject.Repos
                 {
                     UserName = orderDto.UserName,
                     PhoneNumber = orderDto.PhoneNumber,
-                    State = orderDto.State,
+                    State = (State)Enum.Parse(typeof(State), orderDto.State),
                     City = orderDto.City,
                     TotalAmount = 0,
                     OrderItems = new List<OrderItem>(),

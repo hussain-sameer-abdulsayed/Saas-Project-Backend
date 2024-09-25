@@ -1,5 +1,7 @@
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
@@ -9,12 +11,13 @@ using SassProject.Repos;
 using SassProject.SassMapper;
 using System.Text;
 using System.Text.Json.Serialization;
+using System.Threading.RateLimiting;
 internal class Program
 {
     private static void Main(string[] args)
     {
         var builder = WebApplication.CreateBuilder(args);
-        var connectionString = builder.Configuration.GetConnectionString("ContextConnection") ?? throw new InvalidOperationException("Connection string 'ContextConnection' not found.");
+        var connectionString = builder.Configuration.GetConnectionString("ContextConnection") ?? throw new InvalidOperationException("Connection string ContextConnection not found.");
 
         builder.Services.AddDbContext<Context>(options => options.UseSqlServer(connectionString));
         // Add Identity and RoleManager
@@ -62,8 +65,23 @@ internal class Program
 
             builder.Services.AddControllers()
             .AddJsonOptions(x =>
-                x.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles);
+            {
+                x.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());// convrt enum numbers to string
+                x.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
+            });
 
+
+
+        // request limiter
+        builder.Services.AddRateLimiter(options =>
+        {
+            options.AddConcurrencyLimiter("concurrencyPolicy", opt =>
+            {
+                opt.PermitLimit = 5;
+                opt.QueueLimit = 5;
+                opt.QueueProcessingOrder = System.Threading.RateLimiting.QueueProcessingOrder.OldestFirst;
+            }).RejectionStatusCode = 429;
+        });
 
 
         builder.Services.AddSwaggerGen(c =>
@@ -80,7 +98,7 @@ internal class Program
                 Scheme = "Bearer",
                 BearerFormat = "JWT",
                 In = ParameterLocation.Header,
-                Description = "JWT Authorization header using the Bearer scheme. \r\n\r\n Enter 'Bearer' [space] and then your token in the text input below.\r\n\r\nExample: \"Bearer 1safsfsdfdfd\"",
+                Description = "JWT Authorization header using the Bearer scheme. \r\n\r\n Enter Bearer [space] and then your token in the text input below.\r\n\r\nExample: \"Bearer 1safsfsdfdfd\"",
             });
             c.AddSecurityRequirement(new OpenApiSecurityRequirement {
         {
@@ -94,8 +112,17 @@ internal class Program
         }
     });
         });
-
-
+        // frontend seetup
+        builder.Services.AddCors(options =>
+        {
+            options.AddPolicy("reactApp", policy =>
+            {
+                policy.WithOrigins("http://localhost:3000")
+                      .AllowAnyHeader()
+                      .AllowAnyMethod()
+                      .AllowCredentials();
+            });
+        });
 
 
         // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
@@ -115,9 +142,12 @@ internal class Program
 
         app.UseHttpsRedirection();
 
-
+        app.UseCors("reactApp"); // frontend seetup
         app.UseAuthentication();
         app.UseAuthorization();
+
+        
+        app.UseRateLimiter(); // request limiter
 
         app.MapControllers();
 

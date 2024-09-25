@@ -208,7 +208,7 @@ namespace SassProject.Controllers
 
 
         [HttpPost()]
-        public async Task<IActionResult> CreateOrder(CreateOrderDto orderDto)
+        public async Task<IActionResult> CreateOrder([FromBody]CreateOrderDto orderDto)
         {
             try
             {

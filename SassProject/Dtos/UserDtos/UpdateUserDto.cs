@@ -5,10 +5,10 @@ namespace SassProject.Dtos.UserDtos
     public class UpdateUserDto
     {
         [MaxLength(50)]
-        [RegularExpression(@"^[a-zA-Z\s.\-']{2,}$", ErrorMessage = "Please Enter Only Letters")]
+        [RegularExpression(@"^[a-zA-Z\s.\-]{2,}$", ErrorMessage = "Please Enter Only Letters")]
         public string? FirstName { get; set; } = string.Empty;
         [MaxLength(50)]
-        [RegularExpression(@"^[a-zA-Z\s.\-']{2,}$", ErrorMessage = "Please Enter Only Letters")]
+        [RegularExpression(@"^[a-zA-Z\s.\-]{2,}$", ErrorMessage = "Please Enter Only Letters")]
         public string? LastName { get; set; }
         [MaxLength(50)]
         public string? UserName { get; set; } = string.Empty;

@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.Net.Http.Headers;
 using SassProject.Data;
 using SassProject.Dtos.CategoryDto;
@@ -11,6 +12,7 @@ namespace SassProject.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [EnableRateLimiting("concurrencyPolicy")]
     public class CategoriesController : ControllerBase
     {
         private readonly Context _context;
@@ -28,6 +30,7 @@ namespace SassProject.Controllers
             _transactionRepo = transactionRepo;
         }
 
+        
         [HttpGet()]
         public async Task<IActionResult> GetCategoriesAsync()
         {
@@ -64,17 +67,18 @@ namespace SassProject.Controllers
             }
         }
 
-        [Authorize(Roles = "SUPERADMIN, ADMIN")]
+        //[Authorize(Roles = "SUPERADMIN, ADMIN")]
         [HttpPost()]
         public async Task<IActionResult> CreateCategoryAsync(CreateCategoryDto categoryDto)
         {
             try
             {
+                /*
                 string accessToken = Request.Headers[HeaderNames.Authorization];
                 var token = accessToken.Substring(7);
                 var userId = _jWTMangerRepo.GetUserId(token);
-                
-                //var userId = "0842a1a0-44d2-4882-8266-12e5a939d452";
+                */
+                var userId = "0842a1a0-44d2-4882-8266-12e5a939d452";
                 await _transactionRepo.BeginTransactionAsync();
                 var isCreated = await _categoryRepo.CreateCategoryAsync(userId, categoryDto);
                 if (!isCreated.IsSucceeded)

@@ -21,10 +21,10 @@ $.extend( $.fn, {
 	// https://jqueryvalidation.org/validate/
 	validate: function( options ) {
 
-		// If nothing is selected, return nothing; can't chain anyway
+		// If nothing is selected, return nothing; cant chain anyway
 		if ( !this.length ) {
 			if ( options && options.debug && window.console ) {
-				console.warn( "Nothing selected, can't validate, returning nothing." );
+				console.warn( "Nothing selected, cant validate, returning nothing." );
 			}
 			return;
 		}
@@ -74,9 +74,9 @@ $.extend( $.fn, {
 					// The hidden input is inserted in two cases:
 					//   - A user defined a `submitHandler`
 					//   - There was a pending request due to `remote` method and `stopRequest()`
-					//     was called to submit the form in case it's valid
+					//     was called to submit the form in case its valid
 					if ( validator.submitButton && ( validator.settings.submitHandler || validator.formSubmitted ) ) {
-						hidden = $( "<input type='hidden'/>" )
+						hidden = $( "<input type=hidden/>" )
 							.attr( "name", validator.submitButton.name )
 							.val( $( validator.submitButton ).val() )
 							.appendTo( validator.currentForm );
@@ -144,7 +144,7 @@ $.extend( $.fn, {
 		var element = this[ 0 ],
 			settings, staticRules, existingRules, data, param, filtered;
 
-		// If nothing is selected, return empty object; can't chain anyway
+		// If nothing is selected, return empty object; cant chain anyway
 		if ( element == null ) {
 			return;
 		}
@@ -215,7 +215,7 @@ $.extend( $.fn, {
 } );
 
 // Custom selectors
-$.extend( $.expr.pseudos || $.expr[ ":" ], {		// '|| $.expr[ ":" ]' here enables backwards compatibility to jQuery 1.7. Can be removed when dropping jQ 1.7.x support
+$.extend( $.expr.pseudos || $.expr[ ":" ], {		// || $.expr[ ":" ] here enables backwards compatibility to jQuery 1.7. Can be removed when dropping jQ 1.7.x support
 
 	// https://jqueryvalidation.org/blank-selector/
 	blank: function( a ) {
@@ -426,14 +426,14 @@ $.extend( $.validator, {
 
 			$( this.currentForm )
 				.on( "focusin.validate focusout.validate keyup.validate",
-					":text, [type='password'], [type='file'], select, textarea, [type='number'], [type='search'], " +
-					"[type='tel'], [type='url'], [type='email'], [type='datetime'], [type='date'], [type='month'], " +
-					"[type='week'], [type='time'], [type='datetime-local'], [type='range'], [type='color'], " +
-					"[type='radio'], [type='checkbox'], [contenteditable], [type='button']", delegate )
+					":text, [type=password], [type=file], select, textarea, [type=number], [type=search], " +
+					"[type=tel], [type=url], [type=email], [type=datetime], [type=date], [type=month], " +
+					"[type=week], [type=time], [type=datetime-local], [type=range], [type=color], " +
+					"[type=radio], [type=checkbox], [contenteditable], [type=button]", delegate )
 
 				// Support: Chrome, oldIE
 				// "select" is provided as event.target when clicking a option
-				.on( "click.validate", "select, option, [type='radio'], [type='checkbox']", delegate );
+				.on( "click.validate", "select, option, [type=radio], [type=checkbox]", delegate );
 
 			if ( this.settings.invalidHandler ) {
 				$( this.currentForm ).on( "invalid-form.validate", this.settings.invalidHandler );
@@ -612,7 +612,7 @@ $.extend( $.validator, {
 					.filter( ":visible" )
 					.focus()
 
-					// Manually trigger focusin event; without it, focusin handler isn't called, findLastActive won't have anything to find
+					// Manually trigger focusin event; without it, focusin handler isnt called, findLastActive wont have anything to find
 					.trigger( "focusin" );
 				} catch ( e ) {
 
@@ -777,7 +777,7 @@ $.extend( $.validator, {
 					result = $.validator.methods[ method ].call( this, val, element, rule.parameters );
 
 					// If a method indicates that the field is optional and therefore valid,
-					// don't mark it as valid when there are no other rules
+					// dont mark it as valid when there are no other rules
 					if ( result === "dependency-mismatch" && rulesCount === 1 ) {
 						dependencyMismatch = true;
 						continue;
@@ -795,10 +795,10 @@ $.extend( $.validator, {
 					}
 				} catch ( e ) {
 					if ( this.settings.debug && window.console ) {
-						console.log( "Exception occurred when checking element " + element.id + ", check the '" + rule.method + "' method.", e );
+						console.log( "Exception occurred when checking element " + element.id + ", check the " + rule.method + " method.", e );
 					}
 					if ( e instanceof TypeError ) {
-						e.message += ".  Exception occurred when checking element " + element.id + ", check the '" + rule.method + "' method.";
+						e.message += ".  Exception occurred when checking element " + element.id + ", check the " + rule.method + " method.";
 					}
 
 					throw e;
@@ -814,7 +814,7 @@ $.extend( $.validator, {
 		},
 
 		// Return the custom message for the given element and validation method
-		// specified in the element's HTML5 data attribute
+		// specified in the elements HTML5 data attribute
 		// return the generic message if present and no method specific message is present
 		customDataMessage: function( element, method ) {
 			return $( element ).data( "msg" + method.charAt( 0 ).toUpperCase() +
@@ -837,7 +837,7 @@ $.extend( $.validator, {
 			return undefined;
 		},
 
-		// The second parameter 'rule' used to be a string, and extended to an object literal
+		// The second parameter rule used to be a string, and extended to an object literal
 		// of the following form:
 		// rule = {
 		//     method: "method name",
@@ -855,7 +855,7 @@ $.extend( $.validator, {
 					this.customMessage( element.name, rule.method ),
 					this.customDataMessage( element, rule.method ),
 
-					// 'title' is never undefined, so handle empty string as undefined
+					// title is never undefined, so handle empty string as undefined
 					!this.settings.ignoreTitle && element.title || undefined,
 					$.validator.messages[ rule.method ],
 					"<strong>Warning: No message defined for " + element.name + "</strong>"
@@ -967,12 +967,12 @@ $.extend( $.validator, {
 				// Link error back to the element
 				if ( error.is( "label" ) ) {
 
-					// If the error is a label, then associate using 'for'
+					// If the error is a label, then associate using for
 					error.attr( "for", elementID );
 
-					// If the element is not a child of an associated label, then it's necessary
+					// If the element is not a child of an associated label, then its necessary
 					// to explicitly apply aria-describedby
-				} else if ( error.parents( "label[for='" + this.escapeCssMeta( elementID ) + "']" ).length === 0 ) {
+				} else if ( error.parents( "label[for=" + this.escapeCssMeta( elementID ) + "]" ).length === 0 ) {
 					errorID = error.attr( "id" );
 
 					// Respect existing non-error aria-describedby
@@ -991,7 +991,7 @@ $.extend( $.validator, {
 						v = this;
 						$.each( v.groups, function( name, testgroup ) {
 							if ( testgroup === group ) {
-								$( "[name='" + v.escapeCssMeta( name ) + "']", v.currentForm )
+								$( "[name=" + v.escapeCssMeta( name ) + "]", v.currentForm )
 									.attr( "aria-describedby", error.attr( "id" ) );
 							}
 						} );
@@ -1012,9 +1012,9 @@ $.extend( $.validator, {
 		errorsFor: function( element ) {
 			var name = this.escapeCssMeta( this.idOrName( element ) ),
 				describer = $( element ).attr( "aria-describedby" ),
-				selector = "label[for='" + name + "'], label[for='" + name + "'] *";
+				selector = "label[for=" + name + "], label[for=" + name + "] *";
 
-			// 'aria-describedby' should directly reference the error element
+			// aria-describedby should directly reference the error element
 			if ( describer ) {
 				selector = selector + ", #" + this.escapeCssMeta( describer )
 					.replace( /\s+/g, ", #" );
@@ -1029,7 +1029,7 @@ $.extend( $.validator, {
 		// meta-characters that should be escaped in order to be used with JQuery
 		// as a literal part of a name/id or any selector.
 		escapeCssMeta: function( string ) {
-			return string.replace( /([\\!"#$%&'()*+,./:;<=>?@\[\]^`{|}~])/g, "\\$1" );
+			return string.replace( /([\\!"#$%&()*+,./:;<=>?@\[\]^`{|}~])/g, "\\$1" );
 		},
 
 		idOrName: function( element ) {
@@ -1052,7 +1052,7 @@ $.extend( $.validator, {
 		},
 
 		findByName: function( name ) {
-			return $( this.currentForm ).find( "[name='" + this.escapeCssMeta( name ) + "']" );
+			return $( this.currentForm ).find( "[name=" + this.escapeCssMeta( name ) + "]" );
 		},
 
 		getLength: function( value, element ) {
@@ -1113,7 +1113,7 @@ $.extend( $.validator, {
 				// to ensure that the value of the used submit button is passed on
 				// for scripted submits triggered by this method
 				if ( this.submitButton ) {
-					$( "input:hidden[name='" + this.submitButton.name + "']", this.currentForm ).remove();
+					$( "input:hidden[name=" + this.submitButton.name + "]", this.currentForm ).remove();
 				}
 
 				this.formSubmitted = false;
@@ -1197,8 +1197,8 @@ $.extend( $.validator, {
 			rules[ method ] = value;
 		} else if ( type === method && type !== "range" ) {
 
-			// Exception: the jquery validate 'range' method
-			// does not test for the html5 'range' type
+			// Exception: the jquery validate range method
+			// does not test for the html5 range type
 			rules[ method ] = true;
 		}
 	},
@@ -1230,7 +1230,7 @@ $.extend( $.validator, {
 			this.normalizeAttributeRule( rules, type, method, value );
 		}
 
-		// 'maxlength' may be returned as -1, 2147483647 ( IE ) and 524288 ( safari ) for text inputs
+		// maxlength may be returned as -1, 2147483647 ( IE ) and 524288 ( safari ) for text inputs
 		if ( rules.maxlength && /-1|2147483647|524288/.test( rules.maxlength ) ) {
 			delete rules.maxlength;
 		}
@@ -1381,7 +1381,7 @@ $.extend( $.validator, {
 			// Retrieved 2014-01-14
 			// If you have a problem with this implementation, report a bug against the above spec
 			// Or use custom methods to implement your own email validation
-			return this.optional( element ) || /^[a-zA-Z0-9.!#$%&'*+\/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/.test( value );
+			return this.optional( element ) || /^[a-zA-Z0-9.!#$%&*+\/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/.test( value );
 		},
 
 		// https://jqueryvalidation.org/url-method/
@@ -1477,7 +1477,7 @@ $.extend( $.validator, {
 
 			decimals = decimalPlaces( param );
 
-			// Value can't have too many decimals
+			// Value cant have too many decimals
 			if ( decimalPlaces( value ) > decimals || toInt( value ) % toInt( param ) !== 0 ) {
 				valid = false;
 			}

@@ -6,12 +6,12 @@
 /*global document: false, jQuery: false */
 
 (function (factory) {
-    if (typeof define === 'function' && define.amd) {
+    if (typeof define === function && define.amd) {
         // AMD. Register as an anonymous module.
-        define("jquery.validate.unobtrusive", ['jquery-validation'], factory);
-    } else if (typeof module === 'object' && module.exports) {
+        define("jquery.validate.unobtrusive", [jquery-validation], factory);
+    } else if (typeof module === object && module.exports) {
         // CommonJS-like environments that support module.exports
-        module.exports = factory(require('jquery-validation'));
+        module.exports = factory(require(jquery-validation));
     } else {
         // Browser global
         jQuery.validator.unobtrusive = factory(jQuery);
@@ -34,7 +34,7 @@
 
     function escapeAttributeValue(value) {
         // As mentioned on http://api.jquery.com/category/selectors/
-        return value.replace(/([!"#$%&'()*+,./:;<=>?@\[\\\]^`{|}~])/g, "\\$1");
+        return value.replace(/([!"#$%&()*+,./:;<=>?@\[\\\]^`{|}~])/g, "\\$1");
     }
 
     function getModelPrefix(fieldName) {
@@ -48,8 +48,8 @@
         return value;
     }
 
-    function onError(error, inputElement) {  // 'this' is the form element
-        var container = $(this).find("[data-valmsg-for='" + escapeAttributeValue(inputElement[0].name) + "']"),
+    function onError(error, inputElement) {  // this is the form element
+        var container = $(this).find("[data-valmsg-for=" + escapeAttributeValue(inputElement[0].name) + "]"),
             replaceAttrValue = container.attr("data-valmsg-replace"),
             replace = replaceAttrValue ? $.parseJSON(replaceAttrValue) !== false : null;
 
@@ -65,7 +65,7 @@
         }
     }
 
-    function onErrors(event, validator) {  // 'this' is the form element
+    function onErrors(event, validator) {  // this is the form element
         var container = $(this).find("[data-valmsg-summary=true]"),
             list = container.find("ul");
 
@@ -79,7 +79,7 @@
         }
     }
 
-    function onSuccess(error) {  // 'this' is the form element
+    function onSuccess(error) {  // this is the form element
         var container = error.data("unobtrusiveContainer");
 
         if (container) {
@@ -95,13 +95,13 @@
         }
     }
 
-    function onReset(event) {  // 'this' is the form element
+    function onReset(event) {  // this is the form element
         var $form = $(this),
-            key = '__jquery_unobtrusive_validation_form_reset';
+            key = __jquery_unobtrusive_validation_form_reset;
         if ($form.data(key)) {
             return;
         }
-        // Set a flag that indicates we're currently resetting the form.
+        // Set a flag that indicates were currently resetting the form.
         $form.data(key, true);
         try {
             $form.data("validator").resetForm();
@@ -132,7 +132,7 @@
 
         if (!result) {
             result = {
-                options: {  // options structure passed to jQuery Validate's validate() method
+                options: {  // options structure passed to jQuery Validates validate() method
                     errorClass: defaultOptions.errorClass || "input-validation-error",
                     errorElement: defaultOptions.errorElement || "span",
                     errorPlacement: function () {
@@ -229,7 +229,7 @@
             /// </summary>
             /// <param name="selector" type="String">Any valid jQuery selector.</param>
 
-            // $forms includes all forms in selector's DOM hierarchy (parent, children and self) that have at least one
+            // $forms includes all forms in selectors DOM hierarchy (parent, children and self) that have at least one
             // element with data-val=true
             var $selector = $(selector),
                 $forms = $selector.parents()
@@ -359,8 +359,8 @@
         adapters.addSingleVal("accept", "mimtype");
         adapters.addSingleVal("extension", "extension");
     } else {
-        // for backward compatibility, when the 'extension' validation method does not exist, such as with versions
-        // of JQuery Validation plugin prior to 1.10, we should use the 'accept' method for
+        // for backward compatibility, when the extension validation method does not exist, such as with versions
+        // of JQuery Validation plugin prior to 1.10, we should use the accept method for
         // validating the extension, and ignore mime-type validations as they are not supported.
         adapters.addSingleVal("extension", "extension", "accept");
     }
@@ -373,7 +373,7 @@
         var prefix = getModelPrefix(options.element.name),
             other = options.params.other,
             fullOtherName = appendModelPrefix(other, prefix),
-            element = $(options.form).find(":input").filter("[name='" + escapeAttributeValue(fullOtherName) + "']")[0];
+            element = $(options.form).find(":input").filter("[name=" + escapeAttributeValue(fullOtherName) + "]")[0];
 
         setValidationValues(options, "equalTo", element);
     });
@@ -394,13 +394,13 @@
         $.each(splitAndTrim(options.params.additionalfields || options.element.name), function (i, fieldName) {
             var paramName = appendModelPrefix(fieldName, prefix);
             value.data[paramName] = function () {
-                var field = $(options.form).find(":input").filter("[name='" + escapeAttributeValue(paramName) + "']");
+                var field = $(options.form).find(":input").filter("[name=" + escapeAttributeValue(paramName) + "]");
                 // For checkboxes and radio buttons, only pick up values from checked fields.
                 if (field.is(":checkbox")) {
-                    return field.filter(":checked").val() || field.filter(":hidden").val() || '';
+                    return field.filter(":checked").val() || field.filter(":hidden").val() || ;
                 }
                 else if (field.is(":radio")) {
-                    return field.filter(":checked").val() || '';
+                    return field.filter(":checked").val() || ;
                 }
                 return field.val();
             };
