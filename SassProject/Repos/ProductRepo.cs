@@ -4,6 +4,8 @@ using SassProject.Data;
 using SassProject.Dtos.ProductRepo;
 using SassProject.IRepos;
 using SassProject.Models;
+using FuzzyString;
+using System.Drawing.Printing;
 
 namespace SassProject.Repos
 {
@@ -210,5 +212,36 @@ namespace SassProject.Repos
 
             return products;
         }
+
+        public async Task<IEnumerable<Product>> SearchProducts(string query)
+        {
+            // Handle empty or null query scenario
+            if (string.IsNullOrEmpty(query))
+            {
+                return Enumerable.Empty<Product>();
+            }
+
+            // Combine fuzzy search and exact search in one query
+            var products = await _context.Products
+                .Where(p =>
+                    _context.FuzzySearch(p.Name) == _context.FuzzySearch(query) || // Fuzzy search on Name
+                    _context.FuzzySearch(p.Description) == _context.FuzzySearch(query) || // Fuzzy search on Description
+                    p.Name.Contains(query) || // Exact search on Name
+                    p.Description.Contains(query)) // Exact search on Description
+                .ToListAsync();
+
+            // include images (asynchronously)
+            var tasks = products.Select(async product =>
+            {
+                product.MainImage = product.MainImage != null
+                    ? _imageRepo.GetImage(product.MainImage) // Assuming GetImageAsync for async support
+                    : "https://localhost:7249/images/productdefualt.png";
+            });
+
+            await Task.WhenAll(tasks);
+
+            return products;
+        }
+
     }
 }

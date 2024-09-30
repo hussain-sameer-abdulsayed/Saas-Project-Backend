@@ -27,6 +27,13 @@ public class Context : IdentityDbContext<IdentityUser>
     {
         base.OnModelCreating(builder);
 
+        /*
+        builder.HasDbFunction(typeof(Context)
+            .GetMethod(nameof(Levenshtein), new[] { typeof(string), typeof(string) }))
+            .HasName("Levenshtein");
+        */
+
+
         builder.Entity<User>()
             .HasData(new User
             {
@@ -119,6 +126,19 @@ public class Context : IdentityDbContext<IdentityUser>
 
 
     }
+
+    [DbFunction(name:"SOUNDEX",IsBuiltIn =true)]
+    public string FuzzySearch(string query)
+    {
+        throw new NotImplementedException();
+    }
+
+    /*
+    public static int Levenshtein(string s1, string s2)
+    {
+        throw new NotSupportedException("This function is only supported in EF Core queries.");
+    }
+    */
     public static string HashPassword(string password)
     {
         byte[] salt;

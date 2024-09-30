@@ -25,7 +25,7 @@ namespace SassProject.Controllers
             _jWTMangerRepo = jWTMangerRepo;
         }
 
-
+        
         [HttpGet()]
         public async Task<IActionResult> GetProductsAsync()
         {
@@ -44,6 +44,23 @@ namespace SassProject.Controllers
             }
         }
 
+        [HttpGet("Search")]
+        public async Task<IActionResult> SearchProducts(string query)
+        {
+            try
+            {
+                var products = await _productRepo.SearchProducts(query);
+                if (!products.Any())
+                {
+                    return NotFound("There is not products in this name");
+                }
+                return Ok(products);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
 
         [HttpGet("category/{categoryId}")]
         public async Task<IActionResult> GetProductsByCategoryId(int categoryId)
